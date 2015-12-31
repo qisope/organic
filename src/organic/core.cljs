@@ -37,10 +37,7 @@
 (defn create-plant []
   (let [plant-params (parameters/initialize-plant-parameters)]
     (let [segments (create-segments plant-params)]
-      {:segments segments}
-      )
-    )
-  )
+      {:segments segments})))
 
 (defn create-plants [world-params]
   (vec (repeatedly (:plant-count world-params) create-plant)))
@@ -52,9 +49,16 @@
 
 (defonce app-state (atom (create-world)))
 
+(defn update-state [f k]
+  (let [new-value (f (k @app-state))]
+    (swap! app-state assoc-in [k] new-value)))
+
+(defn update-plants [f]
+  (update-state f :plants))
+
 (println (get-in @app-state [:plants 0 :segments 0 :thickness]))
 
-(swap! app-state assoc-in [:plants 0 :segments 0 :thickness] 99)
+(update-plants #(assoc-in % [0 :segments 0 :thickness] 99))
 
 (println (get-in @app-state [:plants 0 :segments 0 :thickness]))
 
